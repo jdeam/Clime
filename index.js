@@ -7,11 +7,11 @@ const cors = require('cors');
 const axios = require('axios');
 
 const dsKey = 'be80b5098f496ff72b37665ecc1b18f4'
-const path = `https://api.darksky.net/forecast/${key}/47.82,-121.556`;
+const path = `https://api.darksky.net/forecast/${dsKey}/47.82,-121.556?extend=hourly`;
 
 let forecast;
 axios.get(path).then(result => {
-  forecast = result;
+  forecast = result.data;
 })
 
 const db = {
