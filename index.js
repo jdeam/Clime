@@ -5,44 +5,46 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
 const axios = require('axios');
+const moment = require('moment');
 
-const dsKey = 'be80b5098f496ff72b37665ecc1b18f4'
-const path = `https://api.darksky.net/forecast/${dsKey}/47.82,-121.556?extend=hourly`;
+const coords = {
+  index: '47.82,-121.556',
+  leavenworth: '47.543,-120.711'
+}
+
+const dsKey = 'be80b5098f496ff72b37665ecc1b18f4';
+const dsPath = `https://api.darksky.net/forecast/${dsKey}/${coords.index}?extend=hourly`;
+
+function extractForecast(data) {
+  let schema = { time: [], temp: [], precip: [] };
+  return data.reduce((forecast, hour, i, arr) => {
+    let time = moment.unix(hour.time);
+    if (!(time.hours()%3)) {
+      forecast.time.push(moment.unix(hour.time));
+      forecast.temp.push(hour.temperature.toFixed(0));
+      forecast.precip.push((hour.precipProbability*100).toFixed(0));
+    }
+    if (i===arr.length-1) {
+      forecast.minTemp = Math.floor(forecast.temp
+        .reduce((min, hour) => Math.min(hour, min))/5)*5;
+      forecast.maxTemp = Math.ceil(forecast.temp
+        .reduce((max, hour) => Math.max(hour, max))/5)*5;
+    }
+    return forecast;
+  }, schema);
+}
 
 let forecast;
-axios.get(path).then(result => {
-  forecast = result.data;
-})
-
-const db = {
-  users: [],
-  favorites: [],
-  crags: []
-};
+axios.get(dsPath).then(result => {
+  forecast = extractForecast(result.data.hourly.data);
+});
 
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 app.use(cors());
 
-app.get('/users/:id', (req, res) => {
-  const id = req.params.id;
-  const foundUser = db.users.find(user => user.id === id);
-  if (foundUser) {
-    return res.status(200).json({ data: foundUser });
-  }
-  res.status(404).json({ error: { message: 'User not found.' } });
-});
-
 app.get('/forecast', (req, res) => {
-  res.status(200).json({ data: forecast });
-});
-
-app.post('/users', (req, res) => {
-  const newUser = {
-    id: req.body.id,
-  }
-  db.users.push(newUser);
-  return res.status(201).json({ data: newUser });
+  res.status(200).json({ forecast });
 });
 
 app.listen(PORT, () => {
