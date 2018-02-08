@@ -6,14 +6,14 @@ const morgan = require('morgan');
 const cors = require('cors');
 const axios = require('axios');
 const moment = require('moment');
-
-const coords = {
-  index: '47.82,-121.556',
-  leavenworth: '47.543,-120.711'
-}
+const crags = require('./crags')
 
 const dsKey = 'be80b5098f496ff72b37665ecc1b18f4';
-const dsPath = `https://api.darksky.net/forecast/${dsKey}/${coords.index}?extend=hourly`;
+const dsPath = `https://api.darksky.net/forecast`;
+
+function buildPath(crag) {
+  return `${dsPath}/${dsKey}/${crag.coords}?extend=hourly`;
+}
 
 function extractForecast(data) {
   let schema = { time: [], temp: [], precip: [] };
@@ -22,7 +22,7 @@ function extractForecast(data) {
     if (!(time.hours()%3)) {
       forecast.time.push(moment.unix(hour.time));
       forecast.temp.push(hour.temperature.toFixed(0));
-      forecast.precip.push((hour.precipProbability*100).toFixed(0));
+      forecast.precip.push((hour.precipProbability*120).toFixed(0));
     }
     if (i===arr.length-1) {
       forecast.minTemp = Math.floor(forecast.temp
@@ -34,18 +34,19 @@ function extractForecast(data) {
   }, schema);
 }
 
-let forecast;
-axios.get(dsPath).then(result => {
-  forecast = extractForecast(result.data.hourly.data);
+crags.forEach(crag => {
+  axios.get(buildPath(crag)).then(result => {
+    crag.forecast = extractForecast(result.data.hourly.data);
+  });
 });
 
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 app.use(cors());
 
-app.get('/forecast', (req, res) => {
-  res.status(200).json({ forecast });
-});
+app.get('/crags', (req, res) => {
+  res.status(200).json({ crags });
+})
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT} ...`);
