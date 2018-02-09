@@ -1,4 +1,5 @@
-const crags = require('./crags');
+const forecasts = require('./forecasts');
+const knex = require('./db/db')
 const axios = require('axios');
 const moment = require('moment');
 const dsKey = 'be80b5098f496ff72b37665ecc1b18f4';
@@ -27,14 +28,33 @@ function extractForecast(data) {
   }, schema);
 }
 
-crags.forEach(crag => {
-  axios.get(buildPath(crag)).then(result => {
-    crag.forecast = extractForecast(result.data.hourly.data);
+//Get forecast data for all crags
+knex('crags').then(result => {
+  let crags = result;
+  crags.forEach(crag => {
+    axios.get(buildPath(crag)).then(result => {
+      let forecast = extractForecast(result.data.hourly.data);
+      forecasts[`${crag.id}`] = forecast;
+    });
   });
 });
 
 function getAllCrags() {
-  return crags;
+  return knex('crags').then(result => {
+    let crags = result;
+    crags.forEach(crag => {
+      crag.forecast = forecasts[`${crag.id}`];
+    });
+    return crags;
+  });
 }
 
-module.exports = { getAllCrags };
+function getCragById(id) {
+  return knex('crags').where('id', id).first().then(result => {
+    let crag = result;
+    crag.forecast = forecasts[`${crag.id}`];
+    return crag;
+  });
+}
+
+module.exports = { getAllCrags, getCragById };
