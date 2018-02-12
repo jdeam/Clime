@@ -19,10 +19,12 @@ function extractForecast(data) {
       forecast.precip.push((hour.precipProbability*120).toFixed(0));
     }
     if (i===arr.length-1) {
-      forecast.minTemp = Math.floor(forecast.temp
-        .reduce((min, hour) => Math.min(hour, min))/5)*5;
-      forecast.maxTemp = Math.ceil(forecast.temp
-        .reduce((max, hour) => Math.max(hour, max))/5)*5;
+      let minTemp = forecast.temp.reduce((min, hour) => Math.min(hour, min));
+      forecast.minTemp = Math.floor(minTemp/5)*5;
+      let maxTemp = forecast.temp.reduce((max, hour) => Math.max(hour, max));
+      forecast.maxTemp = Math.ceil(maxTemp/5)*5;
+      if (forecast.minTemp === minTemp) { forecast.minTemp -= 5 }
+      if (forecast.maxTemp === maxTemp) { forecast.maxTemp += 5 }
     }
     return forecast;
   }, schema);
