@@ -1,4 +1,3 @@
-const forecasts = require('./forecasts');
 const knex = require('./db/db')
 const axios = require('axios');
 const moment = require('moment');
@@ -6,7 +5,7 @@ const dsKey = 'be80b5098f496ff72b37665ecc1b18f4';
 const dsPath = `https://api.darksky.net/forecast/${dsKey}`;
 
 function buildPath(crag) {
-  return `${dsPath}/${crag.coords}?extend=hourly`;
+  return `${dsPath}/${crag.lat},${crag.lng}?extend=hourly`;
 }
 
 function extractForecast(data) {
@@ -16,7 +15,7 @@ function extractForecast(data) {
     if (!(time.hours()%3)) {
       forecast.time.push(moment.unix(hour.time));
       forecast.temp.push(hour.temperature.toFixed(0));
-      forecast.precip.push((hour.precipProbability*120).toFixed(0));
+      forecast.precip.push((hour.precipProbability*130).toFixed(0));
     }
     if (i===arr.length-1) {
       let minTemp = forecast.temp.reduce((min, hour) => Math.min(hour, min));
@@ -30,33 +29,44 @@ function extractForecast(data) {
   }, schema);
 }
 
-//Get forecast data for all crags
-knex('crags').then(result => {
-  let crags = result;
+function appendForecasts(crags) {
+  let forecasts = [];
   crags.forEach(crag => {
-    axios.get(buildPath(crag)).then(result => {
-      let forecast = extractForecast(result.data.hourly.data);
-      forecasts[`${crag.id}`] = forecast;
-    });
+    forecasts.push(axios.get(buildPath(crag)));
   });
-});
+  return Promise.all(forecasts).then(result => {
+    result.forEach((forecast, i) => {
+      crags[i].forecast = extractForecast(forecast.data.hourly.data);
+    });
+    return crags;
+  })
+}
 
 function getAllCrags() {
   return knex('crags').then(result => {
     let crags = result;
-    crags.forEach(crag => {
-      crag.forecast = forecasts[`${crag.id}`];
+    return appendForecasts(crags);
+  });
+}
+
+//1 degree lat/long ~= 69 miles
+const dist = 1.45;
+
+function getCragsByLoc(coords) {
+  coords = coords.split(',');
+  let lat = parseFloat(coords[0]);
+  let lng = parseFloat(coords[1]);
+  coords = { lat, lng };
+  return knex('crags')
+    .whereBetween('lat', [coords.lat-dist, coords.lat+dist])
+    .andWhereBetween('lng', [coords.lng-dist, coords.lng+dist])
+    .then(result => {
+      let crags = result;
+      return appendForecasts(crags);
     });
-    return crags;
-  });
 }
 
-function getCragById(id) {
-  return knex('crags').where('id', id).first().then(result => {
-    let crag = result;
-    crag.forecast = forecasts[`${crag.id}`];
-    return crag;
-  });
-}
+// getAllCrags().then(result => console.log(result));
+// getCragsByLoc('47.66,-122.34').then(result => console.log(result));
 
-module.exports = { getAllCrags, getCragById };
+module.exports = { getAllCrags, getCragsByLoc };

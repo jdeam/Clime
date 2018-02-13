@@ -4,7 +4,8 @@ exports.up = function(knex, Promise) {
     table.increments();
     table.string('name').notNullable();
     table.string('state').notNullable();
-    table.string('coords').notNullable();
+    table.float('lat').notNullable();
+    table.float('lng').notNullable();
   });
 };
 

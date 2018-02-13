@@ -11,7 +11,7 @@ app.use(morgan('dev'));
 app.use(cors());
 
 app.get('/crags', controller.getAllCrags);
-app.get('/crags/:id', controller.getCragById);
+app.get('/crags/:loc', controller.getCragsByLoc);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT} ...`);

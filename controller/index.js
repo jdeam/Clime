@@ -7,12 +7,12 @@ function getAllCrags(req, res) {
   });
 }
 
-function getCragById(req, res) {
-  let id = parseInt(req.params.id);
-  return model.getCragById(id).then(result => {
-    let crag = result;
-    return res.status(200).json({ crag });
-  });
+function getCragsByLoc(req, res) {
+  let loc = req.params.loc;
+  return model.getCragsByLoc(loc).then(result => {
+    let crags = result;
+    return res.status(200).json({ crags });
+  })
 }
 
-module.exports = { getAllCrags, getCragById };
+module.exports = { getAllCrags, getCragsByLoc };
