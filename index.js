@@ -13,6 +13,8 @@ app.use(cors());
 app.get('/crags', controller.getAllCrags);
 app.get('/crags/:loc', controller.getCragsByLoc);
 
+app.post('/users', controller.createUser);
+
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT} ...`);
 });

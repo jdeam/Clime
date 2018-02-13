@@ -15,4 +15,11 @@ function getCragsByLoc(req, res) {
   })
 }
 
-module.exports = { getAllCrags, getCragsByLoc };
+function createUser(req, res) {
+  return model.createUser().then(result => {
+    let user = result;
+    return res.status(201).json({ user });
+  });
+}
+
+module.exports = { getAllCrags, getCragsByLoc, createUser };

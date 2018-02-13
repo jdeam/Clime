@@ -3,9 +3,15 @@ const axios = require('axios');
 const moment = require('moment');
 const dsKey = 'be80b5098f496ff72b37665ecc1b18f4';
 const dsPath = `https://api.darksky.net/forecast/${dsKey}`;
+const gKey = 'AIzaSyARIp9NV4oT7T5BzWnBaR6Nq3DZ5p8Fe9s';
 
-function buildPath(crag) {
+function buildDSPath(crag) {
   return `${dsPath}/${crag.lat},${crag.lng}?extend=hourly`;
+}
+
+function buildGPath(loc) {
+  let url = 'https://maps.googleapis.com/maps/api/geocode/';
+  return `${url}json?address=${loc}&key=${gKey}`;
 }
 
 function extractForecast(data) {
@@ -32,7 +38,7 @@ function extractForecast(data) {
 function appendForecasts(crags) {
   let forecasts = [];
   crags.forEach(crag => {
-    forecasts.push(axios.get(buildPath(crag)));
+    forecasts.push(axios.get(buildDSPath(crag)));
   });
   return Promise.all(forecasts).then(result => {
     result.forEach((forecast, i) => {
@@ -50,23 +56,22 @@ function getAllCrags() {
 }
 
 //1 degree lat/long ~= 69 miles
-const dist = 1.45;
+const dist = 1.5;
 
-function getCragsByLoc(coords) {
-  coords = coords.split(',');
-  let lat = parseFloat(coords[0]);
-  let lng = parseFloat(coords[1]);
-  coords = { lat, lng };
-  return knex('crags')
-    .whereBetween('lat', [coords.lat-dist, coords.lat+dist])
-    .andWhereBetween('lng', [coords.lng-dist, coords.lng+dist])
-    .then(result => {
+function getCragsByLoc(loc) {
+  return axios.get(buildGPath(loc)).then(result => {
+    let coords = result.data.results[0].geometry.location;
+    return knex('crags')
+      .whereBetween('lat', [coords.lat-dist, coords.lat+dist])
+      .andWhereBetween('lng', [coords.lng-dist, coords.lng+dist])
+  }).then(result => {
       let crags = result;
       return appendForecasts(crags);
     });
 }
 
-// getAllCrags().then(result => console.log(result));
-// getCragsByLoc('47.66,-122.34').then(result => console.log(result));
+function createUser() {
+  return knex('users').insert({}).returning('*').first();
+}
 
-module.exports = { getAllCrags, getCragsByLoc };
+module.exports = { getAllCrags, getCragsByLoc, createUser };
