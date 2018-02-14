@@ -16,8 +16,9 @@ function getCragsByLoc(req, res) {
 }
 
 function createUser(req, res) {
-  return model.createUser().then(result => {
-    let user = result;
+  let newUser = req.body.newUser;
+  return model.createUser(newUser).then(result => {
+    let user = result[0];
     return res.status(201).json({ user });
   });
 }

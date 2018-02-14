@@ -70,8 +70,9 @@ function getCragsByLoc(loc) {
     });
 }
 
-function createUser() {
-  return knex('users').insert({}).returning('*').first();
+function createUser(newUser) {
+  let uuid = newUser;
+  return knex('users').insert({ uuid }).returning('*');
 }
 
 module.exports = { getAllCrags, getCragsByLoc, createUser };
