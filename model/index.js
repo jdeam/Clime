@@ -75,4 +75,13 @@ function createUser(newUser) {
   return knex('users').insert({ uuid }).returning('*');
 }
 
-module.exports = { getAllCrags, getCragsByLoc, createUser };
+function getFavoritesByUser(uuid) {
+
+}
+
+module.exports = {
+  getAllCrags,
+  getCragsByLoc,
+  createUser,
+  getFavoritesByUser
+};

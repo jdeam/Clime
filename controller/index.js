@@ -23,4 +23,14 @@ function createUser(req, res) {
   });
 }
 
-module.exports = { getAllCrags, getCragsByLoc, createUser };
+function getFavoritesByUser(req, res) {
+  let uuid = req.params.uuid;
+  
+}
+
+module.exports = {
+  getAllCrags,
+  getCragsByLoc,
+  createUser,
+  getFavoritesByUser
+};
