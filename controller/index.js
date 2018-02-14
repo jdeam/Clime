@@ -25,12 +25,25 @@ function createUser(req, res) {
 
 function getFavoritesByUser(req, res) {
   let uuid = req.params.uuid;
-  
+  return model.getFavoritesByUser(uuid).then(result => {
+    let crags = result;
+    return res.status(200).json({ crags });
+  });
+}
+
+function createFavorite() {
+
+}
+
+function deleteFavorite() {
+
 }
 
 module.exports = {
   getAllCrags,
   getCragsByLoc,
   createUser,
-  getFavoritesByUser
+  getFavoritesByUser,
+  createFavorite,
+  deleteFavorite
 };

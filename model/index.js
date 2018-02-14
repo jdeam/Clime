@@ -67,7 +67,7 @@ function getCragsByLoc(loc) {
   }).then(result => {
       let crags = result;
       return appendForecasts(crags);
-    });
+  });
 }
 
 function createUser(newUser) {
@@ -76,6 +76,21 @@ function createUser(newUser) {
 }
 
 function getFavoritesByUser(uuid) {
+  return knex('favorites')
+    .join('crags', 'crags.id', '=', 'favorites.crag_id')
+    .where('favorites.user_id', uuid)
+    .select('id', 'name', 'state', 'lat', 'lng')
+    .then(result => {
+      let crags = result;
+      return appendForecasts(crags);
+    });
+}
+
+function createFavorite(favorite) {
+
+}
+
+function deleteFavorite() {
 
 }
 
@@ -83,5 +98,7 @@ module.exports = {
   getAllCrags,
   getCragsByLoc,
   createUser,
-  getFavoritesByUser
+  getFavoritesByUser,
+  createFavorite,
+  deleteFavorite
 };

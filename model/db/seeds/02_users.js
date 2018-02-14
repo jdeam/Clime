@@ -5,7 +5,7 @@ exports.seed = function(knex, Promise) {
     .then(function () {
       // Inserts seed entries
       return knex('users').insert([
-        { uuid: 'f52ffb90-11b7-11e8-97ac-a3e2b3012dbc' },
+        { uuid: "c5b03bc0-11c9-11e8-8c5c-ff2744128466" },
       ]);
     });
 };
