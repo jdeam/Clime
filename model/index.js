@@ -1,6 +1,7 @@
 const knex = require('./db/db')
 const axios = require('axios');
 const moment = require('moment');
+const uuid = require('uuid');
 const dsKey = 'be80b5098f496ff72b37665ecc1b18f4';
 const dsPath = `https://api.darksky.net/forecast/${dsKey}`;
 const gKey = 'AIzaSyARIp9NV4oT7T5BzWnBaR6Nq3DZ5p8Fe9s';
@@ -21,7 +22,7 @@ function extractForecast(data) {
     if (!(time.hours()%3)) {
       forecast.time.push(moment.unix(hour.time));
       forecast.temp.push(hour.temperature.toFixed(0));
-      forecast.precip.push((hour.precipProbability*120).toFixed(0));
+      forecast.precip.push((hour.precipProbability*110).toFixed(0));
     }
     if (i===arr.length-1) {
       let minTemp = forecast.temp.reduce((min, hour) => Math.min(hour, min));
@@ -48,13 +49,6 @@ function appendForecasts(crags) {
   })
 }
 
-function getAllCrags() {
-  return knex('crags').then(result => {
-    let crags = result;
-    return appendForecasts(crags);
-  });
-}
-
 //1 degree lat/long ~= 69 miles
 const dist = 2;
 
@@ -70,9 +64,9 @@ function getCragsByLoc(loc) {
   });
 }
 
-function createUser(newUser) {
-  let uuid = newUser;
-  return knex('users').insert({ uuid }).returning('*');
+function createUser() {
+  let id = uuid();
+  return knex('users').insert({ uuid: id }).returning('*');
 }
 
 function getFavoritesByUser(uuid) {
@@ -96,8 +90,8 @@ function deleteFavorite(favorite) {
     .andWhere('crag_id', crag_id).del();
 }
 
+
 module.exports = {
-  getAllCrags,
   getCragsByLoc,
   createUser,
   getFavoritesByUser,
