@@ -21,7 +21,7 @@ function extractForecast(data) {
     if (!(time.hours()%3)) {
       forecast.time.push(moment.unix(hour.time));
       forecast.temp.push(hour.temperature.toFixed(0));
-      forecast.precip.push((hour.precipProbability*130).toFixed(0));
+      forecast.precip.push((hour.precipProbability*120).toFixed(0));
     }
     if (i===arr.length-1) {
       let minTemp = forecast.temp.reduce((min, hour) => Math.min(hour, min));
@@ -56,7 +56,7 @@ function getAllCrags() {
 }
 
 //1 degree lat/long ~= 69 miles
-const dist = 1.5;
+const dist = 2;
 
 function getCragsByLoc(loc) {
   return axios.get(buildGPath(loc)).then(result => {
@@ -87,11 +87,13 @@ function getFavoritesByUser(uuid) {
 }
 
 function createFavorite(favorite) {
-
+  return knex('favorites').insert(favorite).returning('*');
 }
 
-function deleteFavorite() {
-
+function deleteFavorite(favorite) {
+  let { user_id, crag_id } = favorite;
+  return knex('favorites').where('user_id', user_id)
+    .andWhere('crag_id', crag_id).del();
 }
 
 module.exports = {

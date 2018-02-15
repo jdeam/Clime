@@ -31,12 +31,22 @@ function getFavoritesByUser(req, res) {
   });
 }
 
-function createFavorite() {
-
+function createFavorite(req, res) {
+  let user_id = req.params.uuid;
+  let crag_id = req.body.cragId;
+  return model.createFavorite({ user_id, crag_id}).then(result => {
+    let favorite = result[0];
+    return res.status(201).json({ favorite });
+  });
 }
 
-function deleteFavorite() {
-
+function deleteFavorite(req, res) {
+  let user_id = req.params.uuid;
+  let crag_id = req.params.cragId;
+  return model.deleteFavorite({ user_id, crag_id }).then(result => {
+    let deleted = result;
+    return res.status(200).json({ deleted });
+  })
 }
 
 module.exports = {
