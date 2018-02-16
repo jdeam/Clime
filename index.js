@@ -14,6 +14,7 @@ app.get('/crags/:loc', controller.getCragsByLoc);
 app.get('/users/:uuid/favorites', controller.getFavoritesByUser);
 
 app.post('/users', controller.createUser);
+app.post('/crags', controller.createCrag);
 app.post('/users/:uuid/favorites', controller.createFavorite);
 
 app.delete('/users/:uuid/favorites/:cragId', controller.deleteFavorite);

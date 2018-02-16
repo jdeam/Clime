@@ -64,6 +64,26 @@ function getCragsByLoc(loc) {
   });
 }
 
+function getState(crag) {
+  return axios.get(buildGPath(`${crag.lat},${crag.lng}`))
+    .then(result => {
+      return result.data.results[0].address_components[3].short_name;
+    })
+}
+
+function createCrag(crag) {
+  return getState(crag).then(result => {
+    crag.state = result;
+    return crag;
+  }).then(result => {
+    result.lat = parseFloat(result.lat);
+    result.lng = parseFloat(result.lng);
+    return knex('crags').insert(result).returning('*')
+  }).then(result => {
+    return appendForecasts(result);
+  });
+}
+
 function createUser() {
   let id = uuid();
   return knex('users').insert({ uuid: id }).returning('*');
@@ -90,9 +110,15 @@ function deleteFavorite(favorite) {
     .andWhere('crag_id', crag_id).del();
 }
 
+// let test = { name: 'French\'s Dome', lat: '45.397', lng: '-121.86' };
+// let test2 = { name: 'Ten Sleep', lat: '44.139', lng: '-107.245' };
+
+// createCrag(test).then(result => console.log(result));
+// createCrag(test2).then(result => console.log(result));
 
 module.exports = {
   getCragsByLoc,
+  createCrag,
   createUser,
   getFavoritesByUser,
   createFavorite,

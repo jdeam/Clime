@@ -15,5 +15,9 @@ exports.seed = function(knex, Promise) {
         { id: 8, name: 'Trout Creek', state: 'OR', lat: 44.802, lng: -121.109 },
         { id: 9, name: 'Washington Pass', state: 'WA', lat: 48.512, lng: -120.654 }
       ]);
+    }).then(() => {
+      return knex.raw(
+        `SELECT setval('crags_id_seq', (SELECT MAX(id) FROM crags));`
+      );
     });
 };

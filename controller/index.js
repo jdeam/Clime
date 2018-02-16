@@ -8,6 +8,14 @@ function getCragsByLoc(req, res) {
   })
 }
 
+function createCrag(req, res) {
+  let newCrag = req.body;
+  return model.createCrag(newCrag).then(result => {
+    let crag = result;
+    return res.status(201).json({ crag });
+  });
+}
+
 function createUser(req, res) {
   return model.createUser().then(result => {
     let user = result[0];
@@ -43,6 +51,7 @@ function deleteFavorite(req, res) {
 
 module.exports = {
   getCragsByLoc,
+  createCrag,
   createUser,
   getFavoritesByUser,
   createFavorite,
