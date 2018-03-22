@@ -2,9 +2,9 @@ const knex = require('./db/db')
 const axios = require('axios');
 const moment = require('moment');
 const uuid = require('uuid');
-const dsKey = 'be80b5098f496ff72b37665ecc1b18f4';
+const dsKey = process.env.DS_KEY;
 const dsPath = `https://api.darksky.net/forecast/${dsKey}`;
-const gKey = 'AIzaSyARIp9NV4oT7T5BzWnBaR6Nq3DZ5p8Fe9s';
+const gKey = process.env.G_KEY;
 
 function buildDSPath(crag) {
   return `${dsPath}/${crag.lat},${crag.lng}?extend=hourly`;
