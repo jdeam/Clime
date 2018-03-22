@@ -10,9 +10,10 @@ Used Node/Express and vanilla JavaScript DOM manipulation methods to create a fu
 
 * Node.js
 * Express
-* Axios (for calls to Google Geocode/Dark Sky APIs)
+* Chart.js
 * PostgreSQL database via Knex.js
 * Moment.js (for forecast timestamps)
+* Axios (for calls to Google Geocode/Dark Sky APIs)
 
 ![Clime "find crags" screenshot](https://github.com/jdeam/Clime-back-end/blob/master/clime_find_crags.png)
 
