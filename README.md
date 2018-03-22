@@ -7,13 +7,11 @@ Used Node/Express and vanilla JavaScript DOM manipulation methods to create a fu
 **Front end:** https://github.com/jdeam/Clime-front-end
 
 **Technologies used:**
-*Node.js
 
-*Express
-
-*PostgreSQL database via Knex.js
-
-*Moment.js (for forecast timestamps)
+* Node.js
+* Express
+* PostgreSQL database via Knex.js
+* Moment.js (for forecast timestamps)
 
 ![Clime "find crags" screenshot](https://github.com/jdeam/Clime-back-end/blob/master/clime_find_crags.png)
 
