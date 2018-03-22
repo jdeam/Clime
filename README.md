@@ -10,6 +10,7 @@ Used Node/Express and vanilla JavaScript DOM manipulation methods to create a fu
 
 * Node.js
 * Express
+* Axios (for calls to Google Geocode/Dark Sky APIs)
 * PostgreSQL database via Knex.js
 * Moment.js (for forecast timestamps)
 
